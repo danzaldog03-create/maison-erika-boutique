@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { LookItem, DEFAULT_LOOKS } from '@/lib/settings-types'
 import { saveStoreSettings } from '@/lib/admin/actions'
+import { getInstagramHandle } from '@/components/store/shop-the-look'
 
 interface LooksManagerProps {
   initialLooks: LookItem[]
@@ -23,6 +24,9 @@ export function LooksManager({ initialLooks, allSettings, supabaseUrl }: LooksMa
   const router = useRouter()
   const [looks, setLooks] = useState<LookItem[]>(
     initialLooks && initialLooks.length > 0 ? initialLooks : DEFAULT_LOOKS
+  )
+  const [instagramUrl, setInstagramUrl] = useState(
+    allSettings?.instagram_url || 'https://www.instagram.com/erika_maison_ags/'
   )
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [localPreviews, setLocalPreviews] = useState<Record<string, string>>({})
@@ -105,12 +109,13 @@ export function LooksManager({ initialLooks, allSettings, supabaseUrl }: LooksMa
     const formData = new FormData()
     // Populate existing settings
     Object.entries(allSettings).forEach(([key, val]) => {
-      if (key !== 'shop_looks') {
+      if (key !== 'shop_looks' && key !== 'instagram_url') {
         formData.set(key, String(val ?? ''))
       }
     })
-    // Serialize looks array as JSON
+    // Serialize looks array as JSON and updated instagram URL
     formData.set('shop_looks', JSON.stringify(looks))
+    formData.set('instagram_url', instagramUrl.trim())
 
     startTransition(async () => {
       try {
@@ -343,6 +348,23 @@ export function LooksManager({ initialLooks, allSettings, supabaseUrl }: LooksMa
                   onChange={(e) => updateCurrentLook('ctaUrl', e.target.value)}
                   placeholder="#productos o /productos/slug"
                 />
+              </div>
+            </div>
+
+            {/* Instagram Link Configuration */}
+            <div style={{ marginTop: '20px', padding: '16px', background: '#faf7f2', borderRadius: '10px', border: '1px solid #e8dfd5' }}>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', color: '#7a6858', textTransform: 'uppercase', marginBottom: '6px' }}>
+                Cuenta de Instagram vinculada (Botón de redes en tienda)
+              </label>
+              <input
+                type="url"
+                value={instagramUrl}
+                onChange={(e) => setInstagramUrl(e.target.value)}
+                placeholder="https://www.instagram.com/erika_maison_ags/"
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #d4c5b5', fontSize: '14px', background: '#fff' }}
+              />
+              <div style={{ fontSize: '12px', color: '#8c7b6d', marginTop: '6px' }}>
+                En la tienda se mostrará: <strong>Instagram {getInstagramHandle(instagramUrl)} ↗</strong>
               </div>
             </div>
 

@@ -174,7 +174,7 @@ export default async function AdminSettingsPage() {
                 <input
                   name="instagram_url"
                   defaultValue={settings.instagram_url}
-                  placeholder="https://instagram.com/maisonerika"
+                  placeholder="https://www.instagram.com/erika_maison_ags/"
                 />
               </label>
               <label>

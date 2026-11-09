@@ -12,6 +12,21 @@ const FALLBACK_LOOK_IMAGES = [
   '/looks/look-4-unboxing.jpg'
 ]
 
+export function getInstagramHandle(url?: string): string {
+  if (!url) return '@erika_maison_ags'
+  try {
+    const clean = url.trim().replace(/\/+$/, '')
+    const parts = clean.split('/')
+    const last = parts[parts.length - 1]
+    if (last && !last.includes('instagram.com') && !last.includes('http')) {
+      return last.startsWith('@') ? last : `@${last}`
+    }
+  } catch {
+    // fallback
+  }
+  return '@erika_maison_ags'
+}
+
 interface ShopTheLookProps {
   looks?: LookItem[]
   instagramUrl?: string
@@ -21,7 +36,7 @@ interface ShopTheLookProps {
 
 export function ShopTheLook({
   looks = DEFAULT_LOOKS,
-  instagramUrl = 'https://instagram.com/maisonerika',
+  instagramUrl = 'https://www.instagram.com/erika_maison_ags/',
   whatsappNumber = '524490000000',
   supabaseUrl = 'https://jvbaszjtjhzgrarkbhvt.supabase.co'
 }: ShopTheLookProps) {
@@ -134,12 +149,12 @@ export function ShopTheLook({
         <div className="lookbook-social-pill">
           <span>Síguenos en redes:</span>
           <a
-            href={instagramUrl}
+            href={instagramUrl || 'https://www.instagram.com/erika_maison_ags/'}
             target="_blank"
             rel="noopener noreferrer"
             className="lookbook-pill-link"
           >
-            Instagram @maisonerika ↗
+            Instagram {getInstagramHandle(instagramUrl)} ↗
           </a>
         </div>
       </div>
