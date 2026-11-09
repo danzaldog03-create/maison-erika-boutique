@@ -38,26 +38,52 @@ export async function POST(request: Request) {
     }
 
     const filename = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads')
-    await fs.mkdir(uploadsDir, { recursive: true })
-
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    // Save to local public/uploads directory
-    const filePath = path.join(uploadsDir, filename)
-    await fs.writeFile(filePath, buffer)
+    let publicUrl = ''
 
-    // Also attempt background sync to Supabase Storage if bucket is available
+    // 1. Primary storage: Supabase Storage bucket 'product-media' (Persistent on Vercel)
     try {
-      await supabase.storage
+      const storagePath = `uploads/${filename}`
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('product-media')
-        .upload(`uploads/${filename}`, buffer, { contentType: file.type, upsert: true })
-    } catch {
-      // Local copy is primary; remote sync failure is non-fatal
+        .upload(storagePath, buffer, {
+          contentType: file.type || 'image/jpeg',
+          upsert: true
+        })
+
+      if (!uploadError && uploadData) {
+        const { data: urlData } = supabase.storage
+          .from('product-media')
+          .getPublicUrl(storagePath)
+        publicUrl = urlData.publicUrl
+      } else if (uploadError) {
+        console.warn('Supabase storage upload notice:', uploadError.message)
+      }
+    } catch (storageErr) {
+      console.warn('Supabase storage exception:', storageErr)
     }
 
-    const publicUrl = `/uploads/${filename}`
+    // 2. Secondary local cache (only in development environments with writable disk)
+    try {
+      const uploadsDir = path.join(process.cwd(), 'public', 'uploads')
+      await fs.mkdir(uploadsDir, { recursive: true })
+      const filePath = path.join(uploadsDir, filename)
+      await fs.writeFile(filePath, buffer)
+      if (!publicUrl) {
+        publicUrl = `/uploads/${filename}`
+      }
+    } catch {
+      // Ignored: On serverless platforms (Vercel/AWS Lambda), filesystem is read-only (EROFS).
+    }
+
+    if (!publicUrl) {
+      return NextResponse.json(
+        { error: 'No se pudo almacenar el archivo. Verifica los permisos del bucket product-media en Supabase.' },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({
       success: true,
