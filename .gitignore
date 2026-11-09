@@ -1,0 +1,39 @@
+# ==============================================================================
+# MAISON ERIKA — REGLAS DE EXCLUSIÓN GIT (.gitignore)
+# ==============================================================================
+
+# 1. Dependencias
+node_modules/
+.pnpm-store/
+
+# 2. Compilaciones y caché de Next.js
+.next/
+out/
+.turbo/
+build/
+dist/
+
+# 3. Variables de entorno y secretos (SEGURIDAD CRÍTICA)
+.env
+.env.*
+*.env
+env.*
+*.download
+!.env.example
+*.pem
+*.key
+*.cert
+
+# 4. Logs y temporales
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+scratch/
+
+# 5. Sistema operativo
+.DS_Store
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini

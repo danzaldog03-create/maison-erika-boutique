@@ -1,0 +1,12 @@
+{
+  "name": "maison-erika-production",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix maison-erika-next run dev",
+    "build": "npm --prefix maison-erika-next run build",
+    "start": "npm --prefix maison-erika-next run start",
+    "test": "npm --prefix maison-erika-next run test",
+    "lint": "npm --prefix maison-erika-next run lint"
+  }
+}

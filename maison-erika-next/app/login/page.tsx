@@ -1,0 +1,2 @@
+import { GoogleLoginButton } from '@/components/google-login-button'
+export default function LoginPage() { return <main className="login-page"><div className="login-card"><img className="login-logo" src="/maison-erika-logo-transparent.png" alt="Logotipo de Maison Erika"/><div className="eyebrow">MAISON ERIKA · STUDIO</div><h1>Bienvenida, Erika ♡</h1><p>Inicia sesión con la cuenta Google autorizada para administrar tu boutique.</p><GoogleLoginButton/><a href="/" className="back-link">Volver a la tienda</a></div></main> }

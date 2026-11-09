@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+.turbo/
+*.log
+.env*
+*.env
+env.*
+*.download
+!.env.example
+.DS_Store
